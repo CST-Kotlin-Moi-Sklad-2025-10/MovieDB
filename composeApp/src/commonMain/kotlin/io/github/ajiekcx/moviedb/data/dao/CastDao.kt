@@ -13,13 +13,13 @@ interface CastDao {
     @Insert
     suspend fun insertAll(castList: List<Cast>)
     
-    @Query("SELECT * FROM cast WHERE movieId = :movieId")
+    @Query("SELECT * FROM film_cast WHERE movieId = :movieId")
     suspend fun getCastByMovie(movieId: Long): List<Cast>
     
-    @Query("SELECT * FROM cast WHERE actorId = :actorId")
+    @Query("SELECT * FROM film_cast WHERE actorId = :actorId")
     suspend fun getCastByActor(actorId: Long): List<Cast>
     
-    @Query("DELETE FROM cast WHERE movieId = :movieId AND actorId = :actorId")
+    @Query("DELETE FROM film_cast WHERE movieId = :movieId AND actorId = :actorId")
     suspend fun deleteCast(movieId: Long, actorId: Long)
 }
 

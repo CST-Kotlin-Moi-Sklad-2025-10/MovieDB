@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e73fc45accb97835d49a503819e600cd",
+    "identityHash": "2a4d07a5cb2925e9d31d162c0f7707a3",
     "entities": [
       {
         "tableName": "directors",
@@ -125,7 +125,7 @@
         }
       },
       {
-        "tableName": "cast",
+        "tableName": "film_cast",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`movieId` INTEGER NOT NULL, `actorId` INTEGER NOT NULL, PRIMARY KEY(`movieId`, `actorId`), FOREIGN KEY(`movieId`) REFERENCES `movies`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`actorId`) REFERENCES `actors`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
@@ -150,22 +150,22 @@
         },
         "indices": [
           {
-            "name": "index_cast_movieId",
+            "name": "index_film_cast_movieId",
             "unique": false,
             "columnNames": [
               "movieId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_cast_movieId` ON `${TABLE_NAME}` (`movieId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_film_cast_movieId` ON `${TABLE_NAME}` (`movieId`)"
           },
           {
-            "name": "index_cast_actorId",
+            "name": "index_film_cast_actorId",
             "unique": false,
             "columnNames": [
               "actorId"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_cast_actorId` ON `${TABLE_NAME}` (`actorId`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_film_cast_actorId` ON `${TABLE_NAME}` (`actorId`)"
           }
         ],
         "foreignKeys": [
@@ -256,7 +256,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e73fc45accb97835d49a503819e600cd')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a4d07a5cb2925e9d31d162c0f7707a3')"
     ]
   }
 }

@@ -5,7 +5,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 
 @Entity(
-    tableName = "cast",
+    tableName = "film_cast",
     primaryKeys = ["movieId", "actorId"],
     foreignKeys = [
         ForeignKey(

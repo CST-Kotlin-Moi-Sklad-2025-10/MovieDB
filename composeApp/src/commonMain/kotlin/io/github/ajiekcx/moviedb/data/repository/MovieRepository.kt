@@ -102,33 +102,36 @@ class MovieRepository(private val database: MovieDatabase) {
         database.reviewDao().insertAll(reviews)
     }
     
+    /**
+     * Fetches all movies with their complete details using database joins.
+     * This is optimized to use a single query with joins instead of N+1 queries.
+     * 
+     * Before optimization: 1 query for movies + N queries for (director + actors + reviews)
+     * After optimization: 1 query with joins for all data
+     */
     suspend fun getAllMoviesWithDetails(): List<MovieWithDetails> {
-        val movies = database.movieDao().getAllMovies()
-        return movies.map { movie ->
-            val director = database.directorDao().getDirectorById(movie.directorId) 
-                ?: Director(name = "Unknown", birthYear = 0)
-            val actors = database.actorDao().getActorsByMovie(movie.id)
-            val reviews = database.reviewDao().getReviewsByMovie(movie.id)
+        val moviesWithDetailsRelation = database.movieDao().getAllMoviesWithDetailsRelation()
+        return moviesWithDetailsRelation.map { relation ->
             MovieWithDetails(
-                movie = movie,
-                director = director,
-                actors = actors,
-                reviews = reviews
+                movie = relation.movie,
+                director = relation.director,
+                actors = relation.actors,
+                reviews = relation.reviews
             )
         }
     }
     
+    /**
+     * Fetches a single movie with complete details using database joins.
+     * Optimized to use a single query with joins instead of multiple separate queries.
+     */
     suspend fun getMovieWithDetails(movieId: Long): MovieWithDetails? {
-        val movie = database.movieDao().getMovieById(movieId) ?: return null
-        val director = database.directorDao().getDirectorById(movie.directorId)
-            ?: Director(name = "Unknown", birthYear = 0)
-        val actors = database.actorDao().getActorsByMovie(movie.id)
-        val reviews = database.reviewDao().getReviewsByMovie(movie.id)
+        val relation = database.movieDao().getMovieWithDetailsRelation(movieId) ?: return null
         return MovieWithDetails(
-            movie = movie,
-            director = director,
-            actors = actors,
-            reviews = reviews
+            movie = relation.movie,
+            director = relation.director,
+            actors = relation.actors,
+            reviews = relation.reviews
         )
     }
 }

@@ -21,7 +21,7 @@ interface ActorDao {
     
     @Query(
         "SELECT a.id, a.name, a.birthYear FROM actors a " +
-        "INNER JOIN cast c ON a.id = c.actorId " +
+        "INNER JOIN film_cast c ON a.id = c.actorId " +
         "WHERE c.movieId = :movieId"
     )
     suspend fun getActorsByMovie(movieId: Long): List<Actor>

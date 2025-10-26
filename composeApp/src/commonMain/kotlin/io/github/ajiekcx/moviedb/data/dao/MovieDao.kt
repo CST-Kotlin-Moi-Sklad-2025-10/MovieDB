@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import io.github.ajiekcx.moviedb.data.entity.Movie
 import io.github.ajiekcx.moviedb.data.relations.MovieWithActors
+import io.github.ajiekcx.moviedb.data.relations.MovieWithDetailsRelation
 
 @Dao
 interface MovieDao {
@@ -31,5 +32,21 @@ interface MovieDao {
     @Transaction
     @Query("SELECT * FROM movies WHERE id = :movieId")
     suspend fun getMovieWithActors(movieId: Long): MovieWithActors?
+    
+    /**
+     * Fetches all movies with complete details (director, actors, reviews) using joins.
+     * The @Transaction annotation ensures this is executed as a single database transaction.
+     * Room will automatically perform the necessary joins based on @Relation annotations.
+     */
+    @Transaction
+    @Query("SELECT * FROM movies")
+    suspend fun getAllMoviesWithDetailsRelation(): List<MovieWithDetailsRelation>
+    
+    /**
+     * Fetches a single movie with complete details using joins.
+     */
+    @Transaction
+    @Query("SELECT * FROM movies WHERE id = :movieId")
+    suspend fun getMovieWithDetailsRelation(movieId: Long): MovieWithDetailsRelation?
 }
 
