@@ -2,6 +2,8 @@ package io.github.ajiekcx.moviedb.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import io.github.ajiekcx.moviedb.data.converter.DateConverters
 import io.github.ajiekcx.moviedb.data.dao.ActorDao
 import io.github.ajiekcx.moviedb.data.dao.CastDao
 import io.github.ajiekcx.moviedb.data.dao.DirectorDao
@@ -24,6 +26,7 @@ import io.github.ajiekcx.moviedb.data.entity.Review
     version = 1,
     exportSchema = true
 )
+@TypeConverters(DateConverters::class)
 abstract class MovieDatabase : RoomDatabase() {
     abstract fun directorDao(): DirectorDao
     abstract fun movieDao(): MovieDao

@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2a4d07a5cb2925e9d31d162c0f7707a3",
+    "identityHash": "ce9f220a40e4c9fc6013c982dff198c5",
     "entities": [
       {
         "tableName": "directors",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `birthYear` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `birthDate` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,9 +21,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "birthYear",
-            "columnName": "birthYear",
-            "affinity": "INTEGER",
+            "fieldPath": "birthDate",
+            "columnName": "birthDate",
+            "affinity": "TEXT",
             "notNull": true
           }
         ],
@@ -256,7 +256,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a4d07a5cb2925e9d31d162c0f7707a3')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ce9f220a40e4c9fc6013c982dff198c5')"
     ]
   }
 }

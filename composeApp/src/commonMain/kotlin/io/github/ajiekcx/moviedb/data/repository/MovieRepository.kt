@@ -7,6 +7,7 @@ import io.github.ajiekcx.moviedb.data.entity.Director
 import io.github.ajiekcx.moviedb.data.entity.Movie
 import io.github.ajiekcx.moviedb.data.entity.Review
 import io.github.ajiekcx.moviedb.data.relations.MovieWithDetails
+import kotlinx.datetime.LocalDate
 
 class MovieRepository(private val database: MovieDatabase) {
     
@@ -19,9 +20,9 @@ class MovieRepository(private val database: MovieDatabase) {
         
         // Insert Directors
         val directors = listOf(
-            Director(name = "Christopher Nolan", birthYear = 1970),
-            Director(name = "Steven Spielberg", birthYear = 1946),
-            Director(name = "Quentin Tarantino", birthYear = 1963)
+            Director(name = "Christopher Nolan", birthDate = LocalDate(1970, 7, 30)),
+            Director(name = "Steven Spielberg", birthDate = LocalDate(1946, 12, 18)),
+            Director(name = "Quentin Tarantino", birthDate = LocalDate(1963, 3, 27))
         )
         val directorIds = database.directorDao().insertAll(directors)
         

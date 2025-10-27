@@ -9,7 +9,7 @@ This is a Compose Multiplatform sample application demonstrating Room database w
 1. **Director** (`directors` table)
    - `id` (Primary Key, auto-generated)
    - `name` (String)
-   - `birthYear` (Int)
+   - `birthDate` (LocalDate - stored as ISO-8601 String)
 
 2. **Movie** (`movies` table)
    - `id` (Primary Key, auto-generated)
