@@ -1,0 +1,34 @@
+import io.github.ajiekcx.moviedb.data.entity.Actor;
+import io.github.ajiekcx.moviedb.data.entity.Movie;
+import kotlin.collections.List;
+
+-- Query to get movies with their actors (many-to-many via junction table)
+getMoviesWithActors:
+SELECT 
+    m.id AS movie_id,
+    m.title AS movie_title,
+    m.releaseYear AS movie_releaseYear,
+    m.directorId AS movie_directorId,
+    a.id AS actor_id,
+    a.name AS actor_name,
+    a.birthYear AS actor_birthYear
+FROM movies m
+LEFT JOIN film_cast fc ON m.id = fc.movieId
+LEFT JOIN actors a ON fc.actorId = a.id
+ORDER BY m.id, a.id;
+
+getMovieWithActors:
+SELECT 
+    m.id AS movie_id,
+    m.title AS movie_title,
+    m.releaseYear AS movie_releaseYear,
+    m.directorId AS movie_directorId,
+    a.id AS actor_id,
+    a.name AS actor_name,
+    a.birthYear AS actor_birthYear
+FROM movies m
+LEFT JOIN film_cast fc ON m.id = fc.movieId
+LEFT JOIN actors a ON fc.actorId = a.id
+WHERE m.id = ?
+ORDER BY a.id;
+

@@ -1,25 +1,51 @@
 package io.github.ajiekcx.moviedb.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import io.github.ajiekcx.moviedb.data.MovieDatabase
 import io.github.ajiekcx.moviedb.data.entity.Cast
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
-@Dao
-interface CastDao {
-    @Insert
-    suspend fun insert(cast: Cast)
+class CastDao(private val database: MovieDatabase) {
     
-    @Insert
-    suspend fun insertAll(castList: List<Cast>)
+    suspend fun insert(cast: Cast): Unit = withContext(Dispatchers.IO) {
+        database.castQueries.insert(
+            movieId = cast.movieId,
+            actorId = cast.actorId
+        )
+    }
     
-    @Query("SELECT * FROM film_cast WHERE movieId = :movieId")
-    suspend fun getCastByMovie(movieId: Long): List<Cast>
+    suspend fun insertAll(castList: List<Cast>) = withContext(Dispatchers.IO) {
+        database.transaction {
+            castList.forEach { cast ->
+                database.castQueries.insert(
+                    movieId = cast.movieId,
+                    actorId = cast.actorId
+                )
+            }
+        }
+    }
     
-    @Query("SELECT * FROM film_cast WHERE actorId = :actorId")
-    suspend fun getCastByActor(actorId: Long): List<Cast>
+    suspend fun getCastByMovie(movieId: Long): List<Cast> = withContext(Dispatchers.IO) {
+        database.castQueries.getCastByMovie(movieId) { movieId_, actorId ->
+            Cast(
+                movieId = movieId_,
+                actorId = actorId
+            )
+        }.executeAsList()
+    }
     
-    @Query("DELETE FROM film_cast WHERE movieId = :movieId AND actorId = :actorId")
-    suspend fun deleteCast(movieId: Long, actorId: Long)
+    suspend fun getCastByActor(actorId: Long): List<Cast> = withContext(Dispatchers.IO) {
+        database.castQueries.getCastByActor(actorId) { movieId, actorId_ ->
+            Cast(
+                movieId = movieId,
+                actorId = actorId_
+            )
+        }.executeAsList()
+    }
+    
+    suspend fun deleteCast(movieId: Long, actorId: Long) = withContext(Dispatchers.IO) {
+        database.castQueries.deleteCast(movieId, actorId)
+    }
 }
 

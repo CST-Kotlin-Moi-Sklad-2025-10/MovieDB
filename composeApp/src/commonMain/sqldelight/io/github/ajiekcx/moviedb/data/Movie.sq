@@ -1,0 +1,26 @@
+CREATE TABLE movies (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    title TEXT NOT NULL,
+    releaseYear INTEGER NOT NULL,
+    directorId INTEGER NOT NULL,
+    FOREIGN KEY (directorId) REFERENCES directors(id) ON DELETE CASCADE
+);
+
+CREATE INDEX movies_directorId ON movies(directorId);
+
+insert:
+INSERT INTO movies (title, releaseYear, directorId)
+VALUES (?, ?, ?);
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+getAllMovies:
+SELECT * FROM movies;
+
+getMovieById:
+SELECT * FROM movies WHERE id = ?;
+
+getMoviesByDirector:
+SELECT * FROM movies WHERE directorId = ?;
+

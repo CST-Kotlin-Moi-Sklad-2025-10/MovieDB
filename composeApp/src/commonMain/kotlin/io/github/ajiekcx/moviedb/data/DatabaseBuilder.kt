@@ -1,8 +1,8 @@
 package io.github.ajiekcx.moviedb.data
 
-import androidx.room.RoomDatabase
+import app.cash.sqldelight.db.SqlDriver
 
 expect object DatabaseBuilder {
-    fun build(): RoomDatabase.Builder<MovieDatabase>
+    fun createDriver(): SqlDriver
 }
 

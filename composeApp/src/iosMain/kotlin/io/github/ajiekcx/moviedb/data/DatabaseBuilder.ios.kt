@@ -1,31 +1,14 @@
 package io.github.ajiekcx.moviedb.data
 
-import androidx.room.Room
-import androidx.room.RoomDatabase
-import kotlinx.cinterop.ExperimentalForeignApi
-import platform.Foundation.NSDocumentDirectory
-import platform.Foundation.NSFileManager
-import platform.Foundation.NSHomeDirectory
-import platform.Foundation.NSUserDomainMask
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.native.NativeSqliteDriver
 
 actual object DatabaseBuilder {
-    actual fun build(): RoomDatabase.Builder<MovieDatabase> {
-        val dbFilePath = documentDirectory() + "/movie.db"
-        return Room.databaseBuilder<MovieDatabase>(
-            name = dbFilePath
+    actual fun createDriver(): SqlDriver {
+        return NativeSqliteDriver(
+            schema = MovieDatabase.Schema,
+            name = "movie.db"
         )
-    }
-
-    @OptIn(ExperimentalForeignApi::class)
-    private fun documentDirectory(): String {
-        val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
-            directory = NSDocumentDirectory,
-            inDomain = NSUserDomainMask,
-            appropriateForURL = null,
-            create = false,
-            error = null,
-        )
-        return requireNotNull(documentDirectory?.path)
     }
 }
 

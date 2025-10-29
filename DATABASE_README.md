@@ -1,6 +1,6 @@
 # Movie Database - Compose Multiplatform Sample
 
-This is a Compose Multiplatform sample application demonstrating Room database with complex relations.
+This is a Compose Multiplatform sample application demonstrating SQLDelight database with complex relations.
 
 ## Database Schema
 
@@ -52,16 +52,17 @@ This is a Compose Multiplatform sample application demonstrating Room database w
 ## Architecture
 
 ### Data Layer
-- **Entity classes** (`data/entity/`): Room entities representing database tables
-- **DAO interfaces** (`data/dao/`): Data Access Objects for database operations
+- **Entity classes** (`data/entity/`): Data classes representing database tables
+- **DAO classes** (`data/dao/`): Data Access Objects for database operations with Dispatchers.IO
 - **Relation classes** (`data/relations/`): Data classes for nested query results
-- **Database** (`MovieDatabase.kt`): Main Room database configuration
+- **SQLDelight schema** (`sqldelight/`): .sq files defining tables and queries
+- **Database** (`MovieDatabaseWrapper.kt`): Wrapper around SQLDelight-generated database
 - **Repository** (`MovieRepository.kt`): Business logic and data access
 
 ### Platform-Specific
-- **DatabaseBuilder**: Expect/actual pattern for platform-specific database initialization
-  - Android: Uses application context
-  - iOS: Uses NSHomeDirectory
+- **DatabaseBuilder**: Expect/actual pattern for platform-specific SQL drivers
+  - Android: Uses AndroidSqliteDriver
+  - iOS: Uses NativeSqliteDriver
 
 ### UI Layer
 - **MovieViewModel**: ViewModel managing app state
@@ -88,9 +89,9 @@ The database is pre-populated with:
 
 The project uses:
 - Kotlin 2.2.20
-- Room 2.7.0-alpha12
-- Compose Multiplatform 1.9.0
-- KSP for Room code generation
+- SQLDelight 2.1.0
+- Compose Multiplatform 1.9.1
+- All suspend functions use Dispatchers.IO
 
 Run on Android:
 ```bash
@@ -106,17 +107,27 @@ Build for iOS (requires macOS with Xcode):
 
 ```
 composeApp/src/
-├── commonMain/kotlin/io/github/ajiekcx/moviedb/
-│   ├── data/
-│   │   ├── entity/          # Room entities
-│   │   ├── dao/             # Data access objects
-│   │   ├── relations/       # Relation data classes
-│   │   ├── repository/      # Repository layer
-│   │   ├── MovieDatabase.kt
-│   │   └── DatabaseBuilder.kt (expect)
-│   ├── ui/
-│   │   └── MovieViewModel.kt
-│   └── App.kt
+├── commonMain/
+│   ├── kotlin/io/github/ajiekcx/moviedb/
+│   │   ├── data/
+│   │   │   ├── entity/          # Data classes
+│   │   │   ├── dao/             # DAO implementations
+│   │   │   ├── relations/       # Relation data classes
+│   │   │   ├── repository/      # Repository layer
+│   │   │   ├── MovieDatabaseWrapper.kt
+│   │   │   └── DatabaseBuilder.kt (expect)
+│   │   ├── ui/
+│   │   │   └── MovieViewModel.kt
+│   │   └── App.kt
+│   └── sqldelight/io/github/ajiekcx/moviedb/data/
+│       ├── Director.sq          # Director table & queries
+│       ├── Movie.sq             # Movie table & queries
+│       ├── Actor.sq             # Actor table & queries
+│       ├── Cast.sq              # Cast junction table & queries
+│       ├── Review.sq            # Review table & queries
+│       ├── DirectorRelations.sq # Director+Movies JOIN queries
+│       ├── MovieRelations.sq    # Movie+Actors JOIN queries
+│       └── MovieDetailsRelations.sq # Complete details JOIN queries
 ├── androidMain/kotlin/io/github/ajiekcx/moviedb/
 │   ├── data/
 │   │   └── DatabaseBuilder.android.kt (actual)

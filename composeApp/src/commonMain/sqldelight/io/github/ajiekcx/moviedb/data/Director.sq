@@ -1,0 +1,19 @@
+CREATE TABLE directors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    birthDate TEXT NOT NULL
+);
+
+insert:
+INSERT INTO directors (name, birthDate)
+VALUES (?, ?);
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+getAllDirectors:
+SELECT * FROM directors;
+
+getDirectorById:
+SELECT * FROM directors WHERE id = ?;
+

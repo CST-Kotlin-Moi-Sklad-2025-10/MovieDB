@@ -6,8 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.ksp)
-    alias(libs.plugins.room)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -23,7 +22,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = true
+            isStatic = false
             linkerOpts.add("-lsqlite3")
         }
     }
@@ -32,6 +31,10 @@ kotlin {
         androidMain.dependencies {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.sqldelight.android.driver)
+        }
+        iosMain.dependencies {
+            implementation(libs.sqldelight.native.driver)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -42,8 +45,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation(libs.room.runtime)
-            implementation(libs.sqlite.bundled)
+            implementation(libs.sqldelight.coroutines.extensions)
             implementation(libs.kotlinx.datetime)
         }
         commonTest.dependencies {
@@ -81,22 +83,13 @@ android {
 
 dependencies {
     debugImplementation(compose.uiTooling)
-    add("kspAndroid", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
-// Fix task dependencies between KSP and Compose resource generation
-tasks.configureEach {
-    if (name.startsWith("ksp") && name.contains("Kotlin")) {
-        dependsOn(tasks.matching { it.name.startsWith("generateResourceAccessorsFor") })
-        dependsOn(tasks.matching { it.name.startsWith("generateExpectResourceCollectorsFor") })
-        dependsOn(tasks.matching { it.name.startsWith("generateActualResourceCollectorsFor") })
-        dependsOn(tasks.matching { it.name == "generateComposeResClass" })
+sqldelight {
+    databases {
+        create("MovieDatabase") {
+            packageName.set("io.github.ajiekcx.moviedb.data")
+        }
     }
 }
 

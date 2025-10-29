@@ -1,25 +1,59 @@
 package io.github.ajiekcx.moviedb.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import io.github.ajiekcx.moviedb.data.MovieDatabase
 import io.github.ajiekcx.moviedb.data.entity.Review
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
-@Dao
-interface ReviewDao {
-    @Insert
-    suspend fun insert(review: Review)
+class ReviewDao(private val database: MovieDatabase) {
     
-    @Insert
-    suspend fun insertAll(reviews: List<Review>): List<Long>
+    suspend fun insert(review: Review): Long = withContext(Dispatchers.IO) {
+        database.reviewQueries.insert(
+            movieId = review.movieId,
+            rating = review.rating.toLong(),
+            comment = review.comment
+        )
+        database.reviewQueries.lastInsertRowId().executeAsOne()
+    }
     
-    @Query("SELECT * FROM reviews WHERE movieId = :movieId")
-    suspend fun getReviewsByMovie(movieId: Long): List<Review>
+    suspend fun insertAll(reviews: List<Review>): List<Long> = withContext(Dispatchers.IO) {
+        database.transactionWithResult {
+            reviews.map { review ->
+                database.reviewQueries.insert(
+                    movieId = review.movieId,
+                    rating = review.rating.toLong(),
+                    comment = review.comment
+                )
+                database.reviewQueries.lastInsertRowId().executeAsOne()
+            }
+        }
+    }
     
-    @Query("SELECT * FROM reviews WHERE id = :reviewId")
-    suspend fun getReviewById(reviewId: Long): Review?
+    suspend fun getReviewsByMovie(movieId: Long): List<Review> = withContext(Dispatchers.IO) {
+        database.reviewQueries.getReviewsByMovie(movieId) { id, movieId_, rating, comment ->
+            Review(
+                id = id,
+                movieId = movieId_,
+                rating = rating.toInt(),
+                comment = comment
+            )
+        }.executeAsList()
+    }
     
-    @Query("SELECT AVG(rating) FROM reviews WHERE movieId = :movieId")
-    suspend fun getAverageRating(movieId: Long): Double?
+    suspend fun getReviewById(reviewId: Long): Review? = withContext(Dispatchers.IO) {
+        database.reviewQueries.getReviewById(reviewId) { id, movieId, rating, comment ->
+            Review(
+                id = id,
+                movieId = movieId,
+                rating = rating.toInt(),
+                comment = comment
+            )
+        }.executeAsOneOrNull()
+    }
+    
+    suspend fun getAverageRating(movieId: Long): Double? = withContext(Dispatchers.IO) {
+        database.reviewQueries.getAverageRating(movieId).executeAsOneOrNull()?.AVG
+    }
 }
 

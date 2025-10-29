@@ -1,29 +1,60 @@
 package io.github.ajiekcx.moviedb.data.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.Query
+import io.github.ajiekcx.moviedb.data.MovieDatabase
 import io.github.ajiekcx.moviedb.data.entity.Actor
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 
-@Dao
-interface ActorDao {
-    @Insert
-    suspend fun insert(actor: Actor)
-    
-    @Insert
-    suspend fun insertAll(actors: List<Actor>)
-    
-    @Query("SELECT * FROM actors")
-    suspend fun getAllActors(): List<Actor>
-    
-    @Query("SELECT * FROM actors WHERE id = :actorId")
-    suspend fun getActorById(actorId: Long): Actor?
-    
-    @Query(
-        "SELECT a.id, a.name, a.birthYear FROM actors a " +
-        "INNER JOIN film_cast c ON a.id = c.actorId " +
-        "WHERE c.movieId = :movieId"
-    )
-    suspend fun getActorsByMovie(movieId: Long): List<Actor>
+class ActorDao(private val database: MovieDatabase) {
+
+    suspend fun insert(actor: Actor) = withContext(Dispatchers.IO) {
+        database.actorQueries.insert(
+            name = actor.name,
+            birthYear = actor.birthYear.toLong()
+        )
+        database.actorQueries.lastInsertRowId().executeAsOne()
+    }
+
+    suspend fun insertAll(actors: List<Actor>) = withContext(Dispatchers.IO) {
+        database.transaction {
+            actors.forEach { actor ->
+                database.actorQueries.insert(
+                    name = actor.name,
+                    birthYear = actor.birthYear.toLong()
+                )
+            }
+        }
+    }
+
+    suspend fun getAllActors(): List<Actor> = withContext(Dispatchers.IO) {
+        database.actorQueries.getAllActors { id, name, birthYear ->
+            Actor(
+                id = id,
+                name = name,
+                birthYear = birthYear.toInt()
+            )
+        }.executeAsList()
+    }
+
+    suspend fun getActorById(actorId: Long): Actor? = withContext(Dispatchers.IO) {
+        database.actorQueries.getActorById(actorId) { id, name, birthYear ->
+            Actor(
+                id = id,
+                name = name,
+                birthYear = birthYear.toInt()
+            )
+        }.executeAsOneOrNull()
+    }
+
+    suspend fun getActorsByMovie(movieId: Long): List<Actor> = withContext(Dispatchers.IO) {
+        database.actorQueries.getActorsByMovie(movieId) { id, name, birthYear ->
+            Actor(
+                id = id,
+                name = name,
+                birthYear = birthYear.toInt()
+            )
+        }.executeAsList()
+    }
 }
 

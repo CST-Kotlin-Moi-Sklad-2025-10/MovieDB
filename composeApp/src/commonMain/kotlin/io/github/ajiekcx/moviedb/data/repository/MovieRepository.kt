@@ -1,6 +1,6 @@
 package io.github.ajiekcx.moviedb.data.repository
 
-import io.github.ajiekcx.moviedb.data.MovieDatabase
+import io.github.ajiekcx.moviedb.data.MovieDatabaseWrapper
 import io.github.ajiekcx.moviedb.data.entity.Actor
 import io.github.ajiekcx.moviedb.data.entity.Cast
 import io.github.ajiekcx.moviedb.data.entity.Director
@@ -9,7 +9,7 @@ import io.github.ajiekcx.moviedb.data.entity.Review
 import io.github.ajiekcx.moviedb.data.relations.MovieWithDetails
 import kotlinx.datetime.LocalDate
 
-class MovieRepository(private val database: MovieDatabase) {
+class MovieRepository(private val database: MovieDatabaseWrapper) {
     suspend fun seedData() {
         // Check if data already exists
         val existingDirectors = database.directorDao().getAllDirectors()
@@ -18,14 +18,18 @@ class MovieRepository(private val database: MovieDatabase) {
         }
 
         // Insert Directors
-        val directors = listOf(
+        val directorsList = listOf(
             Director(name = "Christopher Nolan", birthDate = LocalDate(1970, 7, 30)),
             Director(name = "Steven Spielberg", birthDate = LocalDate(1946, 12, 18)),
             Director(name = "Quentin Tarantino", birthDate = LocalDate(1963, 3, 27))
         )
+        database.directorDao().insertAll(directorsList)
+        
+        // Query back to get generated IDs
+        val directors = database.directorDao().getAllDirectors()
 
         // Insert Movies
-        val movies = listOf(
+        val moviesList = listOf(
             Movie(title = "Inception", releaseYear = 2010, directorId = directors[0].id),
             Movie(title = "Interstellar", releaseYear = 2014, directorId = directors[0].id),
             Movie(title = "The Dark Knight", releaseYear = 2008, directorId = directors[0].id),
@@ -35,10 +39,13 @@ class MovieRepository(private val database: MovieDatabase) {
             Movie(title = "Django Unchained", releaseYear = 2012, directorId = directors[2].id),
             Movie(title = "Kill Bill", releaseYear = 2003, directorId = directors[2].id)
         )
-        val movieIds = database.movieDao().insertAll(movies)
+        database.movieDao().insertAll(moviesList)
+        
+        // Query back to get generated IDs
+        val movies = database.movieDao().getAllMovies()
 
         // Insert Actors
-        val actors = listOf(
+        val actorsList = listOf(
             Actor(name = "Leonardo DiCaprio", birthYear = 1974),
             Actor(name = "Marion Cotillard", birthYear = 1975),
             Actor(name = "Matthew McConaughey", birthYear = 1969),
@@ -51,6 +58,10 @@ class MovieRepository(private val database: MovieDatabase) {
             Actor(name = "Uma Thurman", birthYear = 1970),
             Actor(name = "Jamie Foxx", birthYear = 1967)
         )
+        database.actorDao().insertAll(actorsList)
+        
+        // Query back to get generated IDs
+        val actors = database.actorDao().getAllActors()
 
         // Insert Cast (Movie-Actor relationships)
         val castList = listOf(

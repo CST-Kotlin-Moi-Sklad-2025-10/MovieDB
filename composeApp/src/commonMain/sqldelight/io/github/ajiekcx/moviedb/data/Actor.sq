@@ -1,0 +1,25 @@
+CREATE TABLE actors (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    name TEXT NOT NULL,
+    birthYear INTEGER NOT NULL
+);
+
+insert:
+INSERT INTO actors (name, birthYear)
+VALUES (?, ?);
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+getAllActors:
+SELECT * FROM actors;
+
+getActorById:
+SELECT * FROM actors WHERE id = ?;
+
+getActorsByMovie:
+SELECT a.id, a.name, a.birthYear
+FROM actors a
+INNER JOIN film_cast c ON a.id = c.actorId
+WHERE c.movieId = ?;
+

@@ -1,0 +1,26 @@
+CREATE TABLE reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    movieId INTEGER NOT NULL,
+    rating INTEGER NOT NULL,
+    comment TEXT NOT NULL,
+    FOREIGN KEY (movieId) REFERENCES movies(id) ON DELETE CASCADE
+);
+
+CREATE INDEX reviews_movieId ON reviews(movieId);
+
+insert:
+INSERT INTO reviews (movieId, rating, comment)
+VALUES (?, ?, ?);
+
+lastInsertRowId:
+SELECT last_insert_rowid();
+
+getReviewsByMovie:
+SELECT * FROM reviews WHERE movieId = ?;
+
+getReviewById:
+SELECT * FROM reviews WHERE id = ?;
+
+getAverageRating:
+SELECT AVG(rating) FROM reviews WHERE movieId = ?;
+

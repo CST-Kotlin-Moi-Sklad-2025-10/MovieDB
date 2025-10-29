@@ -1,8 +1,8 @@
 package io.github.ajiekcx.moviedb.data
 
 import android.content.Context
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import app.cash.sqldelight.db.SqlDriver
+import app.cash.sqldelight.driver.android.AndroidSqliteDriver
 
 actual object DatabaseBuilder {
     private lateinit var appContext: Context
@@ -11,11 +11,11 @@ actual object DatabaseBuilder {
         appContext = context.applicationContext
     }
     
-    actual fun build(): RoomDatabase.Builder<MovieDatabase> {
-        val dbFile = appContext.getDatabasePath("movie.db")
-        return Room.databaseBuilder<MovieDatabase>(
+    actual fun createDriver(): SqlDriver {
+        return AndroidSqliteDriver(
+            schema = MovieDatabase.Schema,
             context = appContext,
-            name = dbFile.absolutePath
+            name = "movie.db"
         )
     }
 }

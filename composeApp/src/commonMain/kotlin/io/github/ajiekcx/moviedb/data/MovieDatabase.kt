@@ -1,44 +1,28 @@
 package io.github.ajiekcx.moviedb.data
 
-import androidx.room.ConstructedBy
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.RoomDatabaseConstructor
-import androidx.room.TypeConverters
-import io.github.ajiekcx.moviedb.data.converter.DateConverters
+import app.cash.sqldelight.db.SqlDriver
 import io.github.ajiekcx.moviedb.data.dao.ActorDao
 import io.github.ajiekcx.moviedb.data.dao.CastDao
 import io.github.ajiekcx.moviedb.data.dao.DirectorDao
 import io.github.ajiekcx.moviedb.data.dao.MovieDao
 import io.github.ajiekcx.moviedb.data.dao.ReviewDao
-import io.github.ajiekcx.moviedb.data.entity.Actor
-import io.github.ajiekcx.moviedb.data.entity.Cast
-import io.github.ajiekcx.moviedb.data.entity.Director
-import io.github.ajiekcx.moviedb.data.entity.Movie
-import io.github.ajiekcx.moviedb.data.entity.Review
 
-@Database(
-    entities = [
-        Director::class,
-        Movie::class,
-        Actor::class,
-        Cast::class,
-        Review::class
-    ],
-    version = 1,
-    exportSchema = true
-)
-@ConstructedBy(MovieDatabaseConstructor::class)
-@TypeConverters(DateConverters::class)
-abstract class MovieDatabase : RoomDatabase() {
-    abstract fun directorDao(): DirectorDao
-    abstract fun movieDao(): MovieDao
-    abstract fun actorDao(): ActorDao
-    abstract fun castDao(): CastDao
-    abstract fun reviewDao(): ReviewDao
-}
-
-@Suppress("KotlinNoActualForExpect")
-expect object MovieDatabaseConstructor : RoomDatabaseConstructor<MovieDatabase> {
-    override fun initialize(): MovieDatabase
+/**
+ * Wrapper class around SQLDelight-generated MovieDatabase.
+ * Provides DAO instances for database operations.
+ */
+class MovieDatabaseWrapper(driver: SqlDriver) {
+    private val database = MovieDatabase(driver)
+    
+    private val _directorDao: DirectorDao by lazy { DirectorDao(database) }
+    private val _movieDao: MovieDao by lazy { MovieDao(database) }
+    private val _actorDao: ActorDao by lazy { ActorDao(database) }
+    private val _castDao: CastDao by lazy { CastDao(database) }
+    private val _reviewDao: ReviewDao by lazy { ReviewDao(database) }
+    
+    fun directorDao(): DirectorDao = _directorDao
+    fun movieDao(): MovieDao = _movieDao
+    fun actorDao(): ActorDao = _actorDao
+    fun castDao(): CastDao = _castDao
+    fun reviewDao(): ReviewDao = _reviewDao
 }

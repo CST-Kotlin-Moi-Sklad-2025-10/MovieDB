@@ -1,0 +1,28 @@
+-- Query to get directors with their movies (one-to-many)
+getDirectorsWithMovies:
+SELECT 
+    d.id AS director_id,
+    d.name AS director_name,
+    d.birthDate AS director_birthDate,
+    m.id AS movie_id,
+    m.title AS movie_title,
+    m.releaseYear AS movie_releaseYear,
+    m.directorId AS movie_directorId
+FROM directors d
+LEFT JOIN movies m ON d.id = m.directorId
+ORDER BY d.id, m.id;
+
+getDirectorWithMovies:
+SELECT 
+    d.id AS director_id,
+    d.name AS director_name,
+    d.birthDate AS director_birthDate,
+    m.id AS movie_id,
+    m.title AS movie_title,
+    m.releaseYear AS movie_releaseYear,
+    m.directorId AS movie_directorId
+FROM directors d
+LEFT JOIN movies m ON d.id = m.directorId
+WHERE d.id = ?
+ORDER BY m.id;
+

@@ -1,0 +1,48 @@
+-- Query to get movies with complete details: director, actors, and reviews
+getAllMoviesWithDetailsRelation:
+SELECT 
+    m.id AS movie_id,
+    m.title AS movie_title,
+    m.releaseYear AS movie_releaseYear,
+    m.directorId AS movie_directorId,
+    d.id AS director_id,
+    d.name AS director_name,
+    d.birthDate AS director_birthDate,
+    a.id AS actor_id,
+    a.name AS actor_name,
+    a.birthYear AS actor_birthYear,
+    r.id AS review_id,
+    r.movieId AS review_movieId,
+    r.rating AS review_rating,
+    r.comment AS review_comment
+FROM movies m
+INNER JOIN directors d ON m.directorId = d.id
+LEFT JOIN film_cast fc ON m.id = fc.movieId
+LEFT JOIN actors a ON fc.actorId = a.id
+LEFT JOIN reviews r ON m.id = r.movieId
+ORDER BY m.id, a.id, r.id;
+
+getMovieWithDetailsRelation:
+SELECT 
+    m.id AS movie_id,
+    m.title AS movie_title,
+    m.releaseYear AS movie_releaseYear,
+    m.directorId AS movie_directorId,
+    d.id AS director_id,
+    d.name AS director_name,
+    d.birthDate AS director_birthDate,
+    a.id AS actor_id,
+    a.name AS actor_name,
+    a.birthYear AS actor_birthYear,
+    r.id AS review_id,
+    r.movieId AS review_movieId,
+    r.rating AS review_rating,
+    r.comment AS review_comment
+FROM movies m
+INNER JOIN directors d ON m.directorId = d.id
+LEFT JOIN film_cast fc ON m.id = fc.movieId
+LEFT JOIN actors a ON fc.actorId = a.id
+LEFT JOIN reviews r ON m.id = r.movieId
+WHERE m.id = ?
+ORDER BY a.id, r.id;
+
