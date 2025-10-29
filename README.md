@@ -1,35 +1,139 @@
-This is a Kotlin Multiplatform project targeting Android, iOS.
+# Movie Database - Compose Multiplatform Sample
 
-* [/composeApp](./composeApp/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./composeApp/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    the [iosMain](./composeApp/src/iosMain/kotlin) folder would be the right place for such calls.
-    Similarly, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./composeApp/src/jvmMain/kotlin)
-    folder is the appropriate location.
+This is a Compose Multiplatform sample application demonstrating SQLDelight database with complex relations.
 
-* [/iosApp](./iosApp/iosApp) contains iOS applications. Even if you’re sharing your UI with Compose Multiplatform,
-  you need this entry point for your iOS app. This is also where you should add SwiftUI code for your project.
+## Database Schema
 
-### Build and Run Android Application
+### Entities
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :composeApp:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :composeApp:assembleDebug
-  ```
+1. **Director** (`directors` table)
+  - `id` (Primary Key, auto-generated)
+  - `name` (String)
+  - `birthDate` (LocalDate - stored as ISO-8601 String)
 
-### Build and Run iOS Application
+2. **Movie** (`movies` table)
+  - `id` (Primary Key, auto-generated)
+  - `title` (String)
+  - `releaseYear` (Int)
+  - `directorId` (Foreign Key → Director)
 
-To build and run the development version of the iOS app, use the run configuration from the run widget
-in your IDE’s toolbar or open the [/iosApp](./iosApp) directory in Xcode and run it from there.
+3. **Actor** (`actors` table)
+  - `id` (Primary Key, auto-generated)
+  - `name` (String)
+  - `birthYear` (Int)
 
----
+4. **Cast** (`cast` table) - Junction table for Many-to-Many
+  - `movieId` (Foreign Key → Movie, part of composite primary key)
+  - `actorId` (Foreign Key → Actor, part of composite primary key)
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html)…
+5. **Review** (`reviews` table)
+  - `id` (Primary Key, auto-generated)
+  - `movieId` (Foreign Key → Movie)
+  - `rating` (Int, 1-5 stars)
+  - `comment` (String)
+
+## Database Relations
+
+### Director ↔ Movie: One-to-Many
+- One director can direct multiple movies
+- Each movie has exactly one director
+- Implemented via foreign key `directorId` in Movie table
+
+### Movie ↔ Actor: Many-to-Many
+- One movie can have multiple actors
+- One actor can appear in multiple movies
+- Implemented via junction table `Cast` with composite primary key
+
+### Movie ↔ Review: One-to-Many
+- One movie can have multiple reviews
+- Each review belongs to exactly one movie
+- Implemented via foreign key `movieId` in Review table
+
+## Architecture
+
+### Data Layer
+- **Entity classes** (`data/entity/`): Data classes representing database tables
+- **DAO classes** (`data/dao/`): Data Access Objects for database operations with Dispatchers.IO
+- **Relation classes** (`data/relations/`): Data classes for nested query results
+- **SQLDelight schema** (`sqldelight/`): .sq files defining tables and queries
+- **Database** (`MovieDatabaseWrapper.kt`): Wrapper around SQLDelight-generated database
+- **Repository** (`MovieRepository.kt`): Business logic and data access
+
+### Platform-Specific
+- **DatabaseBuilder**: Expect/actual pattern for platform-specific SQL drivers
+  - Android: Uses AndroidSqliteDriver
+  - iOS: Uses NativeSqliteDriver
+
+### UI Layer
+- **MovieViewModel**: ViewModel managing app state
+- **App.kt**: Main UI with expandable movie cards
+
+## Sample Data
+
+The database is pre-populated with:
+- 3 directors (Christopher Nolan, Steven Spielberg, Quentin Tarantino)
+- 8 movies
+- 11 actors
+- Movie-Actor relationships
+- 15 reviews
+
+## Features
+
+- **Loading State**: Shows progress indicator while loading data
+- **Movie List**: Displays all movies with title, year, and director
+- **Expandable Cards**: Tap any movie to see full details
+- **Cast Information**: View all actors in the movie
+- **Reviews**: See user reviews with star ratings
+
+## Building
+
+The project uses:
+- Kotlin 2.2.20
+- SQLDelight 2.1.0
+- Compose Multiplatform 1.9.1
+- All suspend functions use Dispatchers.IO
+
+Run on Android:
+```bash
+./gradlew :composeApp:installDebug
+```
+
+Build for iOS (requires macOS with Xcode):
+```bash
+./gradlew :composeApp:iosSimulatorArm64Build
+```
+
+## File Structure
+
+```
+composeApp/src/
+├── commonMain/
+│   ├── kotlin/io/github/ajiekcx/moviedb/
+│   │   ├── data/
+│   │   │   ├── entity/          # Data classes
+│   │   │   ├── dao/             # DAO implementations
+│   │   │   ├── relations/       # Relation data classes
+│   │   │   ├── repository/      # Repository layer
+│   │   │   ├── MovieDatabaseWrapper.kt
+│   │   │   └── DatabaseBuilder.kt (expect)
+│   │   ├── ui/
+│   │   │   └── MovieViewModel.kt
+│   │   └── App.kt
+│   └── sqldelight/io/github/ajiekcx/moviedb/data/
+│       ├── Director.sq          # Director table & queries
+│       ├── Movie.sq             # Movie table & queries
+│       ├── Actor.sq             # Actor table & queries
+│       ├── Cast.sq              # Cast junction table & queries
+│       ├── Review.sq            # Review table & queries
+│       ├── DirectorRelations.sq # Director+Movies JOIN queries
+│       ├── MovieRelations.sq    # Movie+Actors JOIN queries
+│       └── MovieDetailsRelations.sq # Complete details JOIN queries
+├── androidMain/kotlin/io/github/ajiekcx/moviedb/
+│   ├── data/
+│   │   └── DatabaseBuilder.android.kt (actual)
+│   └── MainActivity.kt
+└── iosMain/kotlin/io/github/ajiekcx/moviedb/
+    └── data/
+        └── DatabaseBuilder.ios.kt (actual)
+```
+
