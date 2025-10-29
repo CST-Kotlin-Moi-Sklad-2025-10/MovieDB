@@ -1,7 +1,9 @@
 package io.github.ajiekcx.moviedb.data
 
+import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
 import io.github.ajiekcx.moviedb.data.converter.DateConverters
 import io.github.ajiekcx.moviedb.data.dao.ActorDao
@@ -26,6 +28,7 @@ import io.github.ajiekcx.moviedb.data.entity.Review
     version = 1,
     exportSchema = true
 )
+@ConstructedBy(MovieDatabaseConstructor::class)
 @TypeConverters(DateConverters::class)
 abstract class MovieDatabase : RoomDatabase() {
     abstract fun directorDao(): DirectorDao
@@ -35,3 +38,7 @@ abstract class MovieDatabase : RoomDatabase() {
     abstract fun reviewDao(): ReviewDao
 }
 
+@Suppress("KotlinNoActualForExpect")
+expect object MovieDatabaseConstructor : RoomDatabaseConstructor<MovieDatabase> {
+    override fun initialize(): MovieDatabase
+}

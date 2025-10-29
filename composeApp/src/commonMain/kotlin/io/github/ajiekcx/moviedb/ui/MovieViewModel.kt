@@ -2,17 +2,22 @@ package io.github.ajiekcx.moviedb.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import io.github.ajiekcx.moviedb.data.DatabaseBuilder
 import io.github.ajiekcx.moviedb.data.relations.MovieWithDetails
 import io.github.ajiekcx.moviedb.data.repository.MovieRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MovieViewModel : ViewModel() {
-    
-    private val database = DatabaseBuilder.build().build()
+    private val database = DatabaseBuilder.build()
+        .setDriver(BundledSQLiteDriver())
+        .setQueryCoroutineContext(Dispatchers.IO)
+        .build()
     private val repository = MovieRepository(database)
     
     private val _movies = MutableStateFlow<List<MovieWithDetails>>(emptyList())
