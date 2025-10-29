@@ -11,10 +11,10 @@ import io.github.ajiekcx.moviedb.data.relations.MovieWithDetailsRelation
 @Dao
 interface MovieDao {
     @Insert
-    suspend fun insert(movie: Movie): Long
+    suspend fun insert(movie: Movie)
     
     @Insert
-    suspend fun insertAll(movies: List<Movie>): List<Long>
+    suspend fun insertAll(movies: List<Movie>)
     
     @Query("SELECT * FROM movies")
     suspend fun getAllMovies(): List<Movie>

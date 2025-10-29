@@ -8,7 +8,7 @@ import io.github.ajiekcx.moviedb.data.entity.Review
 @Dao
 interface ReviewDao {
     @Insert
-    suspend fun insert(review: Review): Long
+    suspend fun insert(review: Review)
     
     @Insert
     suspend fun insertAll(reviews: List<Review>): List<Long>

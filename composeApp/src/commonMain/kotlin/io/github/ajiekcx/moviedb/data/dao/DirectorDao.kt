@@ -10,10 +10,10 @@ import io.github.ajiekcx.moviedb.data.relations.DirectorWithMovies
 @Dao
 interface DirectorDao {
     @Insert
-    suspend fun insert(director: Director): Long
+    suspend fun insert(director: Director)
     
     @Insert
-    suspend fun insertAll(directors: List<Director>): List<Long>
+    suspend fun insertAll(directors: List<Director>)
     
     @Query("SELECT * FROM directors")
     suspend fun getAllDirectors(): List<Director>

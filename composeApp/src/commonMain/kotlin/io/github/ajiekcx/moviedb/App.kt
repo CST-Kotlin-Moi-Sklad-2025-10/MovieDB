@@ -27,7 +27,9 @@ fun App() {
         val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
         
         Surface(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .statusBarsPadding()
+                .fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
             if (isLoading) {

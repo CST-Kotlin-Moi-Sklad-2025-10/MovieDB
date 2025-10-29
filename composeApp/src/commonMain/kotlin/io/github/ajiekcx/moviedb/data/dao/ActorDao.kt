@@ -8,10 +8,10 @@ import io.github.ajiekcx.moviedb.data.entity.Actor
 @Dao
 interface ActorDao {
     @Insert
-    suspend fun insert(actor: Actor): Long
+    suspend fun insert(actor: Actor)
     
     @Insert
-    suspend fun insertAll(actors: List<Actor>): List<Long>
+    suspend fun insertAll(actors: List<Actor>)
     
     @Query("SELECT * FROM actors")
     suspend fun getAllActors(): List<Actor>
