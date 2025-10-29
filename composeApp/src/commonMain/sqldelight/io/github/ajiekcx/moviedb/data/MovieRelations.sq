@@ -1,7 +1,3 @@
-import io.github.ajiekcx.moviedb.data.entity.Actor;
-import io.github.ajiekcx.moviedb.data.entity.Movie;
-import kotlin.collections.List;
-
 -- Query to get movies with their actors (many-to-many via junction table)
 getMoviesWithActors:
 SELECT 

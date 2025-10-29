@@ -6,55 +6,73 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 
-class ActorDao(private val database: MovieDatabase) {
+interface ActorDao {
+    suspend fun insert(actor: Actor): Long
+    suspend fun insertAll(actors: List<Actor>)
+    suspend fun getAllActors(): List<Actor>
+    suspend fun getActorById(actorId: Long): Actor?
+    suspend fun getActorsByMovie(movieId: Long): List<Actor>
+}
 
-    suspend fun insert(actor: Actor) = withContext(Dispatchers.IO) {
-        database.actorQueries.insert(
-            name = actor.name,
-            birthYear = actor.birthYear.toLong()
-        )
-        database.actorQueries.lastInsertRowId().executeAsOne()
+class ActorDaoImpl(private val database: MovieDatabase) : ActorDao {
+
+    override suspend fun insert(actor: Actor): Long {
+        return withContext(Dispatchers.IO) {
+            database.actorQueries.insert(
+                name = actor.name,
+                birthYear = actor.birthYear.toLong()
+            )
+            database.actorQueries.lastInsertRowId().executeAsOne()
+        }
     }
 
-    suspend fun insertAll(actors: List<Actor>) = withContext(Dispatchers.IO) {
-        database.transaction {
-            actors.forEach { actor ->
-                database.actorQueries.insert(
-                    name = actor.name,
-                    birthYear = actor.birthYear.toLong()
-                )
+    override suspend fun insertAll(actors: List<Actor>) {
+        return withContext(Dispatchers.IO) {
+            database.transaction {
+                actors.forEach { actor ->
+                    database.actorQueries.insert(
+                        name = actor.name,
+                        birthYear = actor.birthYear.toLong()
+                    )
+                }
             }
         }
     }
 
-    suspend fun getAllActors(): List<Actor> = withContext(Dispatchers.IO) {
-        database.actorQueries.getAllActors { id, name, birthYear ->
-            Actor(
-                id = id,
-                name = name,
-                birthYear = birthYear.toInt()
-            )
-        }.executeAsList()
+    override suspend fun getAllActors(): List<Actor> {
+        return withContext(Dispatchers.IO) {
+            database.actorQueries.getAllActors { id, name, birthYear ->
+                Actor(
+                    id = id,
+                    name = name,
+                    birthYear = birthYear.toInt()
+                )
+            }.executeAsList()
+        }
     }
 
-    suspend fun getActorById(actorId: Long): Actor? = withContext(Dispatchers.IO) {
-        database.actorQueries.getActorById(actorId) { id, name, birthYear ->
-            Actor(
-                id = id,
-                name = name,
-                birthYear = birthYear.toInt()
-            )
-        }.executeAsOneOrNull()
+    override suspend fun getActorById(actorId: Long): Actor? {
+        return withContext(Dispatchers.IO) {
+            database.actorQueries.getActorById(actorId) { id, name, birthYear ->
+                Actor(
+                    id = id,
+                    name = name,
+                    birthYear = birthYear.toInt()
+                )
+            }.executeAsOneOrNull()
+        }
     }
 
-    suspend fun getActorsByMovie(movieId: Long): List<Actor> = withContext(Dispatchers.IO) {
-        database.actorQueries.getActorsByMovie(movieId) { id, name, birthYear ->
-            Actor(
-                id = id,
-                name = name,
-                birthYear = birthYear.toInt()
-            )
-        }.executeAsList()
+    override suspend fun getActorsByMovie(movieId: Long): List<Actor> {
+        return withContext(Dispatchers.IO) {
+            database.actorQueries.getActorsByMovie(movieId) { id, name, birthYear ->
+                Actor(
+                    id = id,
+                    name = name,
+                    birthYear = birthYear.toInt()
+                )
+            }.executeAsList()
+        }
     }
 }
 
